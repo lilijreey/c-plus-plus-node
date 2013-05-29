@@ -1,25 +1,28 @@
 /*
- * =====================================================================================
- *
  *       Filename:  iterator.cpp
- *
- *    Description:  
- *
- *        Version:  1.0
- *        Created:  10/10/2011 09:14:32 PM
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  lilijreey (), lilijreey@Gmail.com
- *        Company:  
- *
- * =====================================================================================
  */
 #include	<iostream>
 #include	<vector>
 #include	<string>
 #include	<algorithm>
 #include	<iterator>
+
+///迭代器的类型
+//  
+//
+
+///std::next(iterator, step) sine c++11  -> new iter
+// 把一个指定的迭代他，++(向后移动 step 次
+///std::advance -> void
+// 和std::next 相同，只是next只接受 ForwardIterator 的Iter引用
+// advance接受InputIterator, advance 不返回之接受引用
+
+///std::prev(iterator, step) sine c++11
+// 把一个指定的迭代他，-- step 次
+
+///std::distance
+// 返回两个迭代器的距离
+
 using namespace std ;
 int main() {
 	int i = 1 ;
