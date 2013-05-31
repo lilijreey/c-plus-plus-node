@@ -1,5 +1,5 @@
 OBJECTS= tuple array varTemplateParameter initializer_list constexpr \
-	 rightValueReference lambda deleteControl regex chrono function
+	 rightValueReference lambda deleteControl regex chrono function other
 
 all: $(OBJECTS)
 
@@ -51,6 +51,9 @@ chrono: chrono.cpp
 	$(compile-and-run)
 
 function: function.cpp
+	$(compile-and-run)
+
+other: othersFeature.cpp
 	$(compile-and-run)
 
 clean:

@@ -25,9 +25,14 @@
 // 为了获得左值的右值必须使用 std::move<T>()
 
 //Qus. 返回一个可以进行右值构造语义的对象， 需要申明返回值是右值类型的吗？
-//       std::vector<int>&& fun() {} ? 
-//       std::vector<int> func() {}  ? 哪个对？
-//       func 返回需要使用std::move/1 函数
+//       1 std::vector<int>&& fun() {} ? 
+//       2 std::vector<int> func() {}  ? 哪个对？
+//       func 返回需要使用std::move/1函数吗 ?
+//Ans.   使用2，就可以，gcc会优化掉返回后的对象的构造，返回是也不需要使用
+//        std::move/1 
+//        如果使用std::move 会导致现实的调用move construct
+//Qus. 给一个没有move construc的对象只用右值引用构造，会调用什么?
+//Ans. 会调用他的普通构造函数
 
 /// std::is_move_constructible<T>::value 
 //   用来检测类型T是否支持右值
@@ -36,20 +41,6 @@
 /// std::forward<T>(v) 等同于 static_cast<T&&>(value)
 //forward 起到转发作用, 如果 T的类型为 R&， R&&， 转发后类型还是一样的
 //
-  /// list 中的node 实现
-  template<typename _Tp>
-    struct _List_node : public __detail::_List_node_base
-    {
-      ///< User's data.
-      _Tp _M_data;
-
-#ifdef __GXX_EXPERIMENTAL_CXX0X__ //Qus. what is forward
-      template<typename... _Args>
-        _List_node(_Args&&... __args)
-	: __detail::_List_node_base(), _M_data(std::forward<_Args>(__args)...) 
-        { }
-#endif
-    };
 
 
 struct TT{
@@ -68,19 +59,49 @@ struct TT{
     TT& operator=(const TT& other) {printf ( "operator=\n" ); _vec = other._vec ;return *this;}
     TT& operator=(TT&& other) {printf ( "move operator=\n" ); _vec = other._vec ;return *this;}
 
-    void ss() {printf ( "ss\n" );}
+    void ss() {printf ( "Tss\n" );}
     std::vector<int>  _vec;
 
     std::vector<int>::iterator begin(){ return _vec.begin(); }
     std::vector<int>::iterator end(){ return _vec.end(); }
 };
 
+struct NN{
+    NN() { printf ( "default construction\n" );}
+    NN(const NN& t) 
+        : _vec(t._vec) 
+    {printf ( "copy construction\n" );}
+
+    //move 
+//    NN(NN&& t) 
+//        : _vec(t._vec) 
+//    {printf ( "move copy construction\n" );}
+
+    ~NN() {printf ( "destruction\n" );}
+
+    NN& operator=(const NN& other) {printf ( "operator=\n" ); _vec = other._vec ;return *this;}
+//    NN& operator=(NN&& other) {printf ( "move operator=\n" ); _vec = other._vec ;return *this;}
+
+    void ss() {printf ( "Nss\n" );}
+    std::vector<int>  _vec;
+
+};
+
 TT  newTT() {
     TT t;
     t.ss();
-    return t;
+    return t; //使用这个gcc会优化之产生一个对象，
+//    return std::move(t); //使用move会产生连个对象（一个是现在的，一个是
+//    return后的新对象
 }
 
+//gcc4.6 会优化返回复制，只创建一次, 不管是C11，还是C89
+NN newNN()
+{
+  NN n;
+  n.ss();
+  return std::move(n);
+}
 
 void ss(const int& i) {printf ( "addr:%p\n", &i );} //const 引用
 void s1(const int&& i) {printf ( "addr:%p\n", &i );} //const rvalue 引用 参数只能是right value
@@ -102,6 +123,7 @@ template <typename T> void myMoveSwap(T&a, T&b)
 
 
 int main() {
+
 #if 0
     ss(0);
     s1(0);
@@ -132,8 +154,14 @@ int main() {
     //    std::vector<TT> v;
     //    v.push_back(TT());
 
-    TT t3 ;
-    t3 = newTT(); //Move =
+    printf("TTreturn construct\n");
+    TT t3 = newTT(); //Move =
+    t3.ss();
+
+    printf("TTreturn construct\n");
+    NN t4 = newNN(); //Move =
+    t4.ss();
+
     //EE 这是就会出发move语义，因为TT有move函数，而newTT返回的是右值
     //    TT t1;
     //    for (int i=0; i < 5; ++i) 

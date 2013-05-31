@@ -83,13 +83,13 @@ int main()
   //写一个返回一个闭包的function
 
   ///@bug 把GCC4.6.4 搞挂了
-//  std::function<std::function<int()>(int)> rclouse = [](int i) {
-//    return [&i](){++i;};
-//  };
-//
-//  //得到一个初始化i=3 的add function
-//  std::function<int()> seed3 = rclouse(3);
-//  printf("%d\n", seed3());
+  std::function<std::function<int()>(int)> rclouse = [](int i) {
+    return [i](){++i;};
+  };
+
+  //得到一个初始化i=3 的add function
+  std::function<int()> seed3 = rclouse(3);
+  printf("%d\n", seed3());
 
   ///@note create from other std::function
   //std::function<void()> xx = std::bind(xx)
