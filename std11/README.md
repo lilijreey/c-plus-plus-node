@@ -30,3 +30,7 @@ New Lib
 11. regular expressions <regex> header
 12. Data and time <chrono> header
 13. forward-list
+14. emplace-op 不会产生copy后move动作直接在容器上产生对象
+     std::vector<Obj> fef;
+     fef.push_back(Obj(123)); //这个可能会产生 copy 后move操作，从Obj到vector中
+     fef.emplace_back(123) 之产生对象一次

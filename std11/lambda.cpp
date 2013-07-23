@@ -1,11 +1,39 @@
-/*
- *  Description: Lambda func
- *               1. 不需要为lambda函数提供返回值，返回值会
- *               根据语义自动推道。
- *               2. 没有函数名
- *               3. 每一个lambda 都会有一个Clousur 闭包
+/**
+ *  Description: Lambda  Expressions
+ *  表达式 [](params){body;}.
+ *  
+ *  @c upvalue [] 方括号中指定lambda的upvalue
+ *    默认是值传递
+ *     1.值传递：在实参前加=号
+ *     [=vs]
+ *     2.引用传递：在实参前加&号 
+ *     [&vs]
+ *     3.[ = ] 任何被用到的外部变量都by value pass to lambda
+ *     4.[ & ] 任何被用到的外部变量都by reference pass to lambda
+ *     5.[vs]  默认为穿值
+ *     6.[vs, x] 多个参数用，隔开
+ *     7.[=, &vs] 只用vs通过ref引用其他都是穿值
+ *     8.[&, vs]
+ *     9. 当upvalue 要使用类成员函数时，使用this
+ *     
+ *  @p Essentially Lambda generates:
+ *    把lambda表达式转换成一个函数对象
+ *    class MagicType {
+ *    public:
+ *      bool operator()(params) {body;}
+ *      type upvale1;
+ *      type upvale2;
+ *    };
  *
+ *  @p retrun-type
+ *    可选
+ *    1. 当body只有return是会自动推动出返回类型
+ *    2. body 返回void类型时
+ *    其他情况
+ *     必须 [](params) -> double {body}
  *
+ *  
+ *   
  */
 
 #include <iostream>
@@ -32,17 +60,6 @@ int main() {
 	    );
 
 #endif
-    // EE lambda 函数的 upvalue 在[]中指定,
-    // 1.值传递：在实参前加=号
-    // [=vs]
-    // 2.引用传递：在实参前加&号 
-    // [&vs]
-    // 3.[ = ] 任何被用到的外部变量都by value pass to lambda
-    // 4.[ & ] 任何被用到的外部变量都by reference pass to lambda
-    // 5.[vs]  默认为穿值
-    // 6.[vs, x] 多个参数用，隔开
-    // 7.[=, &vs] 只用vs通过ref引用其他都是穿值
-    // 8.[&, vs]
    
     //EE 效率 比较 -O几乎相同  -O2 lambda 好
     const int NUM=10000000;

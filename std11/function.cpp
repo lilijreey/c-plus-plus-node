@@ -28,16 +28,38 @@
 // 函数的类型<R(xxx)> R 是返回类型，
 
 
+//+ bind 接受任何可以调用的对象， ()
+//  std::bind(需要绑定的函数， 这个函数的参数....）
+//    对于函数成员 std::bind(ClassA::func, &object, args..)
+//int f(int, double, char)
+//  auto x = bind(f, _3, _2, _1)  // 创造一个新的std::functon
+//               他的参数位置和f相反
+//  auto x2 = bind(f, _1, 2.2, 'c');
+//
+//+ 无法使用bind 来绑定重载的函数， 必须制定哪个版本的重载函数
+//
+//+ 当使用仿函数绑定时，其实是绑定的是operator() 函数
+
+
 #include <functional>
 #include <stdio.h>
 
 void f1() {printf("call f1\n");}
 void f2(int i) {printf("call f2 :%d\n", i);}
 
+void f3(int i, int c, int o)
+{
+  printf("f3 i:%d 2:%d 3:%d\n", i, c, o);
+}
+
 struct A {
   int memf()  {
     printf("A:memf i:%d\n", i);
     return i;
+  }
+  static void staticFunc(int i)
+  {
+    printf("A::static func i%d\n",i);
   }
 
   int i;
@@ -52,8 +74,56 @@ class B {
   {
     _ff(i);
   }
+
+  void setFo(std::function<int(void)> &fo)
+  {
+    _fo = fo;
+  }
+
+  int co()
+  {
+    return _fo();
+  }
  private:
       std::function<void(int)> _ff;
+      std::function<int(void)> _fo;
+};
+
+//吧这个帮给 bind
+struct FunO1
+{
+  FunO1(int i)
+      :_i(i)
+  {}
+
+  int operator()() {
+    printf("FunO1 i:%d\n", _i);
+    return _i;
+  }
+
+  int _i;
+};
+
+struct FunO2
+{
+  FunO2(int i)
+      :_i(i)
+  {}
+
+  int operator()(void) {
+    printf("FunO2 i:%d\n", _i*2);
+    return _i;
+  }
+
+  int _i;
+};
+
+struct FunO3
+{
+  void operator()(int i) {
+    printf("FunO3 i:%d\n", i*2);
+  }
+
 };
 
 int main()
@@ -82,14 +152,14 @@ int main()
   flem(3);
   //写一个返回一个闭包的function
 
-  ///@bug 把GCC4.6.4 搞挂了
-  std::function<std::function<int()>(int)> rclouse = [](int i) {
-    return [i](){++i;};
-  };
+  ///@把GCC4.6.4 搞挂了 4.6 还不支持。 4.8 oK
+//  std::function<std::function<int()>(int)> rclouse = [](int i) {
+//    return [i](){++i;};
+//  };
 
   //得到一个初始化i=3 的add function
-  std::function<int()> seed3 = rclouse(3);
-  printf("%d\n", seed3());
+//  std::function<int()> seed3 = rclouse(3);
+//  printf("%d\n", seed3());
 
   ///@note create from other std::function
   //std::function<void()> xx = std::bind(xx)
@@ -99,6 +169,48 @@ int main()
   b.init(f2);
   b.call(3);
   printf("sizefo classB:%lu\n", sizeof(b));
-  return 0;
 
+  ///@对没有赋值的 std::function<void(int)> f 调用是什么结果
+  // 会抛出异常 std::bad_function_call
+  //  std::function<void(void)> vf;
+  //  vf();
+
+  ///EE 用一个class作为function
+  FunO1 fo = FunO1(3);
+  FunO2 fo2 = FunO2(3);
+  auto fucO = std::bind(fo);
+  fucO();
+  
+  ///EE 把一个bind 放函数传给一个 对象的成员,
+  //这样可以不同类型都可以复用这个仿函数, 如果是个仿函数直接传入对象
+  //需要先使用function 如果直接写入参数编译不过
+  std::function<int()> f1 = std::bind(fo);
+  b.setFo(f1);
+  b.co();
+  f1 = std::bind(fo2);
+  b.setFo(f1);
+  b.co();
+
+  ///bind use _1
+  //std::placeholders 代表的是绑定后的对象的参数, bind 的时候必须给的原函数的参数,
+  // 按原函数的参数位置 e.g. f3 第一个参数是100， bind的对象的第二个参数给 f3
+  // 的地二个参数， bind的第一个参数给f3的第三个参数
+  auto bf3 = std::bind(f3, 100, std::placeholders::_2, std::placeholders::_1);
+; bf3(1,2);
+
+  FunO3 fo3;
+  /// 当要把f3保存到class成员中时这种方法有问题 gcc4,6
+  std::function<void(int)> f3 = std::bind(&FunO3::operator(), &fo3, std::placeholders::_1);
+
+  /// 应该使用这个 上面的方法虽然可以调用但是在离开f3作用预后 调用一个
+  // f3 的copy 可以去去不到bind 时fo3 中的成员对象， 可能是删除了 ???
+  // 而这个就可以
+//  std::function<void(int)> f3x = std::bind(fo3, std::placeholders::_1);
+  fo3(3);
+  
+  ///EE bind 类静态函数
+  std::function<void(int)> statF = std::bind(A::staticFunc, std::placeholders::_1);
+  statF(30);
+
+  return 0;
 }
