@@ -17,20 +17,27 @@
  */
 
 
-#include	<iostream>
+#include <cstdio>
 #include	<map>
 #include	<utility>
 #include	<string>
-using namespace std ;
-int main() {
-	typedef multimap<string, string> SSmap ;
 
-	SSmap dict ;
-	//multimap not has [] operator
-	//dict["day"]= "tag" ; ERROR
+//EE lower_bound
+//upper_bound
 
-	// print mpas
-	}
+int main()
+{
+  std::multimap<int,int> m = {{1,2},{3,4},{4,5},{6,7},{4,6}};
 
+  //lower_bound N 返回map中第一个>= N 的it
+  auto lowerIt = m.lower_bound(3); // 3 ....
+
+  while (lowerIt != m.end()) {
+    printf("k:%d v:%d\n", lowerIt->first, lowerIt->second);
+    ++lowerIt;
+  }
+
+  
 
 }
+

@@ -28,17 +28,37 @@
 // 函数的类型<R(xxx)> R 是返回类型，
 
 
-//+ bind 接受任何可以调用的对象， ()
-//  std::bind(需要绑定的函数， 这个函数的参数....）
-//    对于函数成员 std::bind(ClassA::func, &object, args..)
-//int f(int, double, char)
+///+ bind 接受任何可以调用的对象，返回一个function object
+//  std::bind(callableEntify， Arg1,arg2..)
+///+ 所有传递给 bind  参数都会coyp到bind返回的对象中
+///+ Binding Non-static Mumber Function
+//  需要在参数前先传递"this" bind支持3中类型的this
+//   * Object copy Object to bind
+//     A bh;
+//     std::bind(&A::call, bh, _1); 
+//     这种会coyp
+//     对象，对不不可copy对象不能使用，对用copy开销开的对象不推荐使用
+//   * Pointer
+//     std::bind(&A::call, &bh, _1); 
+//      传递在调用bind的返回对象时 object 必须存在,因为你传递的是指针
+//   * Smart Ponter
+//      std::shared_ptr<A> sp;
+//      std::bind(&A::call, sp, _1); 
+//     
+///+ std::placeholders 
+//     bind返回对象的参数站位符， 从_1 开始，
+///     std::placeholders 使用的是引用传递
 //  auto x = bind(f, _3, _2, _1)  // 创造一个新的std::functon
 //               他的参数位置和f相反
 //  auto x2 = bind(f, _1, 2.2, 'c');
 //
-//+ 无法使用bind 来绑定重载的函数， 必须制定哪个版本的重载函数
-//
-//+ 当使用仿函数绑定时，其实是绑定的是operator() 函数
+///+ 无法使用bind 来绑定重载的函数， 必须制定哪个版本的重载函数
+///+ Lambda VS Bind
+//  lambda 也返回function Object
+//  lambda 通常都比bind 更清晰移动
+//  lambda 通常会生成更好的code
+//  bind 不会内联
+//  lambda 允许内联
 
 
 #include <functional>
@@ -199,15 +219,22 @@ int main()
 ; bf3(1,2);
 
   FunO3 fo3;
-  /// 当要把f3保存到class成员中时这种方法有问题 gcc4,6
+  /// 当要把f3保存到class成员中时这种方法有问题,
+  // 因为 bind 返回一个functionObjc, 保存的是f03的地址，当fo3销毁时，
+  // 在调用bind的返回值就会发生错误 O MyGod!
   std::function<void(int)> f3 = std::bind(&FunO3::operator(), &fo3, std::placeholders::_1);
 
   /// 应该使用这个 上面的方法虽然可以调用但是在离开f3作用预后 调用一个
   // f3 的copy 可以去去不到bind 时fo3 中的成员对象， 可能是删除了 ???
   // 而这个就可以
 //  std::function<void(int)> f3x = std::bind(fo3, std::placeholders::_1);
+//  
   fo3(3);
   
+  //如果在调用bind的返回值时 fo3 可能已经不存在可以传入obj 对象， bind
+  //会copy fo3 来调用他
+  std::function<void(int)> f3o = std::bind(&FunO3::operator(), fo3, std::placeholders::_1);
+
   ///EE bind 类静态函数
   std::function<void(int)> statF = std::bind(A::staticFunc, std::placeholders::_1);
   statF(30);

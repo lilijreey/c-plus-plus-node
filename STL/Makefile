@@ -8,6 +8,9 @@ forward_list: forward_list.cpp
 vector: vector.cpp
 	g++ $(CXXFLAGS) -o $@ $^
 
+map: map.cpp
+	g++ $(CXXFLAGS) -o $@ $^
+
 clear:
 	@rm -f *.o $(OBJECTS)
 
