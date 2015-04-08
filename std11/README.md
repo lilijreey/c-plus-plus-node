@@ -15,6 +15,8 @@ C++11 的新特性
 11. control defualt function =delete;
 12. attributes 属性
 13. decltype
+14. raw string
+    R"delimiter(raw_string)delimiter"
 
 New Lib
 1. array
