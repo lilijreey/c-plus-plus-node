@@ -106,4 +106,5 @@ int main()
 	return 0 ;
 }
 
-
+///EE namespace
+// namespace bo = boost;
