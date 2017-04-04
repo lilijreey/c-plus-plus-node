@@ -13,7 +13,8 @@ class Cc{
     void show() {std::cout << "cc" << std::endl;}
 };
 
-template <typename T, template <typename X, typename Alloc> class CO  >
+template <typename T, 
+template <typename X, typename Alloc> class CO  >
 class C1{
     public:
         CO<T, allocator<T> > a ;

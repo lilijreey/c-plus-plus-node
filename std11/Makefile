@@ -7,7 +7,7 @@ all: $(OBJECTS)
 O:=-O$(o) #immediately assigment
 
 define compile-and-run
-	@g++ -Wall $(O) -std=c++0x $< -o $@
+	@g++ -Wall $(O) -std=c++11 $< -o $@
 	@./$@
 endef
 
@@ -54,6 +54,9 @@ function: function.cpp
 	$(compile-and-run)
 
 other: othersFeature.cpp
+	$(compile-and-run)
+
+alg: algorithms.cpp
 	$(compile-and-run)
 
 clean:

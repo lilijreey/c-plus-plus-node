@@ -16,8 +16,22 @@
 // int  m;
 //const auto * p2 = &m; const int *
 //const auto & i2 = m; const int &
+//
+//
+ //int a = 3;
+ //auto b = &a;
+ //std::cout << typeid(b).name() << std::endl;
+
+ //int &c = a;
+ //auto d = c; //d is int
+ //std::cout << typeid(d).name() << std::endl;
+
+ //auto &d1 = c; d1 is int& reference c
+ //std::cout << typeid(d1).name() << std::endl;
+//
 ///auto&& a1= m; 由于x是左值，所以 a1 type is int&
 ///auto&& a2= std::move(m); a2 type is int&&
+
 
 ///auto 推倒类型时，会忽略const和volatile 退化
 //e.g. const std::list<int> lli;
@@ -30,14 +44,20 @@
 /// auto v1(exp);会使用v1的直接初始化
 /// auto v2 = exp;会使用v2的copy 初始化 
 
+
+///decltype
+//compile-time 得到一个表达式的返回类型，主要用于泛型编程的类型不可
+//声明问题
+//
+
+///EE std::result_of 
+// 在编译期推到出一个function
+
+
 ///std::addressof
 //efined in <memory> header
 //去的一个对象的实际地址，就算&被重载
 //e.g addressof(x);
-
-
-///decltype
-//compile-time 表达是类型识别
 
 
 ///range-base for loop

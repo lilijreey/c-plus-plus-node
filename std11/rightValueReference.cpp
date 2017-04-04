@@ -10,7 +10,7 @@
 //c++03时rvalue 只能绑定在const的引用上
 
 ///EE move 语义 就是移动数据而非复制数据
-///move 语义出发条件
+///move 语义触发条件
 // * 右值对象时(temporary) move 语义会自动触发.
 // * 左值对象，需要使用std::move
 //1 class本神有move构造函数,使用右之构造函数是
@@ -162,7 +162,8 @@ int main() {
     NN t4 = newNN(); //Move =
     t4.ss();
 
-    //EE 这是就会出发move语义，因为TT有move函数，而newTT返回的是右值
+    //EE 这是就会出发move语义，
+    //因为TT有move函数，而newTT返回的是右值
     //    TT t1;
     //    for (int i=0; i < 5; ++i) 
     //	t1._vec.push_back(1);

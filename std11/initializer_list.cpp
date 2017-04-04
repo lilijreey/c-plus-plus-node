@@ -6,7 +6,7 @@
     可以用作函数参数和/或函数返回语句
     允许作为下标表达式
     允许作为构造器调用的参数
-    不允许类型窄化 e.g int xx[] = {1.22, 34.33}; error for initializer_list
+    不允许类型窄化 e.g int xx[] = {1.22, 34.33}; error for initializer_list, 是为了避免某些BUG
  */
 
 #include <stdio.h>
